@@ -1,5 +1,5 @@
 import React from 'react'
-import Setup from './tutorial/8-useContext/setup/1-context-api'
+import Setup from './tutorial/10-prop-types/setup/index'
 //import SetupArray from './tutorial/1-useState/setup/3-useState-array'
 
 function App() {
