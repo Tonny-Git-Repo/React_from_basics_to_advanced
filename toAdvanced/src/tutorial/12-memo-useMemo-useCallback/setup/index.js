@@ -6,33 +6,62 @@ import { useFetch } from '../../9-custom-hooks/final/2-useFetch'
 const url = 'https://course-api.com/javascript-store-products'
 
 // every time props or state changes, component re-renders
+const mostExpensiveItem = (data) =>{
+  return (
+    data.reduce((mostExpensive, item) => {
+      const price = item.fields.price;
+      if(price >= mostExpensive){
+        mostExpensive = price;
+      }
+      return mostExpensive;
+    },0)/100
+  )
+}
 
 const Index = () => {
   const { products } = useFetch(url)
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [ cart, setCart ] = useState(0);
 
+  const addCart = useCallback(() =>{
+    console.log("hier")
+    setCart(cart + 1 )
+  }, [cart]) 
+
+  const mostExpensive = useMemo(() =>
+    mostExpensiveItem(products), [products]
+  )
+  //Each time we click on click me also addToCart will be rerender even if we're not modiffying it
   return (
     <>
       <h1>Count : {count}</h1>
       <button className='btn' onClick={() => setCount(count + 1)}>
         click me
       </button>
-      <BigList products={products} />
+      <h1>{cart}</h1>
+      <h1>Most Expensive: ${mostExpensive}</h1>
+      <BigList products={products} addToCart ={addCart}/>
     </>
   )
 }
 
-const BigList = ({ products }) => {
+ const BigList = React.memo(({ products, addToCart }) => {
+  useEffect(()=>{
+    console.log('single item called')
+  })
   return (
     <section className='products'>
       {products.map((product) => {
-        return <SingleProduct key={product.id} {...product}></SingleProduct>
+        return <SingleProduct key={product.id} {...product} addToCart = {addToCart}></SingleProduct>
       })}
     </section>
   )
-}
+});
 
-const SingleProduct = ({ fields }) => {
+const SingleProduct = ({ fields , addToCart}) => {
+  useEffect(()=>{
+    console.log('single item called')
+  })
   let { name, price } = fields
   price = price / 100
   const image = fields.image[0].url
@@ -42,6 +71,7 @@ const SingleProduct = ({ fields }) => {
       <img src={image} alt={name} />
       <h4>{name}</h4>
       <p>${price}</p>
+      <button onClick = {addToCart}>add</button>
     </article>
   )
 }
